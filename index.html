@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#fbf6f5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Coaching">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Coaching Zentrale</title>
+<style>
+:root{--bg:#fbf6f5;--card:#fff;--ink:#222;--muted:#756c6c;--rose:#b5606c;--blush:#f8e9e8;--line:#eadfde;--warn:#a8321f;--warnbg:#fdeee9;--ok:#2f7d55;--okbg:#e8f4ed}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+.app{display:grid;grid-template-columns:210px 1fr;min-height:100vh}
+nav{background:var(--card);border-right:1px solid var(--line);padding:22px 12px}
+.brand{font-size:13px;letter-spacing:.16em;padding:0 10px 18px;font-weight:600}
+.brand small{display:block;letter-spacing:.04em;color:var(--rose);font-weight:400;margin-top:3px}
+nav button{display:block;width:100%;text-align:left;background:none;border:0;padding:9px 10px;border-radius:7px;font:inherit;color:inherit;cursor:pointer}
+nav button:hover{background:var(--bg)}nav button.on{background:var(--blush);color:var(--rose);font-weight:600}
+main{padding:28px;max-width:1040px;width:100%;min-width:0}
+h1{font-size:25px;margin:0 0 18px}h2{font-size:16px;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}.stat b{display:block;font-size:26px}.stat span{color:var(--muted);font-size:13px}
+.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse}th{font-size:12px;color:var(--muted);text-align:left;font-weight:600}th,td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}tr:last-child td{border-bottom:0}
+button.btn,a.btn{background:var(--rose);color:#fff;border:1px solid var(--rose);padding:7px 12px;border-radius:7px;font:inherit;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block}
+button.alt,a.alt{background:#fff;color:var(--rose)}button.link{background:none;border:0;padding:0;color:var(--rose);font:inherit;cursor:pointer;text-decoration:underline;text-align:left}
+button.danger{background:#fff;color:var(--warn);border-color:var(--warn)}
+input,select,textarea{font:inherit;font-size:16px;padding:7px 9px;border:1px solid var(--line);border-radius:7px;width:100%;background:#fff;color:inherit}textarea{min-height:76px}
+label{display:block;font-size:13px;color:var(--muted)}label>*{margin-top:3px;color:var(--ink)}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.full{grid-column:1/-1}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.between{justify-content:space-between}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--blush);color:var(--rose)}.tag.warn{background:var(--warnbg);color:var(--warn)}.tag.ok{background:var(--okbg);color:var(--ok)}
+.check{display:flex;gap:9px;align-items:flex-start;padding:4px 0;font-size:14px;color:var(--ink)}.check input{width:auto;margin-top:3px}
+.note{background:var(--blush);border-radius:8px;padding:11px 13px;font-size:14px;margin-bottom:14px}.note.warn{background:var(--warnbg)}
+.muted{color:var(--muted);font-size:13px}pre{white-space:pre-wrap;font:inherit;margin:0 0 10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}.grid2 .card{margin:0}
+@media(max-width:720px){.app{display:block}nav{position:sticky;top:0;z-index:5;border-right:0;border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;display:flex;overflow-x:auto;gap:2px}.brand{display:none}nav button{width:auto;white-space:nowrap}main{padding:18px 16px calc(env(safe-area-inset-bottom) + 24px)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+<script>
+const KEY='coaching-zentrale-v1';
+const VIEWS=[['dash','Dashboard'],['clients','Kundinnen'],['checkin','Check-In'],['money','Buchhaltung'],['docs','Vorlagen'],['settings','Daten & Backup']];
+const BASE='05 Tools & Vorlagen/Startpaket Kundin/';
+const DOCS=[['Anamnesebogen',BASE+'Anamnesebogen.pdf'],['Check-in Formular',BASE+'Check-in Formular.pdf'],['Checkliste Ablauf',BASE+'Checkliste Ablauf neue Kundin.pdf'],['Willkommens-Nachrichten',BASE+'Willkommens-Nachrichten.txt'],['Coachingvertrag (leere Vorlage)','Startunterlagen/Coachingvertrag.pdf']];
+const MSGS=[['Nach dem Erstgespräch (E-Mail)','Hey [Name], schön, dass wir gesprochen haben! 🎀\nIm Anhang findest du meinen Anamnesebogen. Füll ihn bitte in Ruhe aus und schick ihn mir per E-Mail zurück. Deine Gesundheitsdaten bitte nicht über WhatsApp schicken.\nSobald ich ihn gelesen habe, melde ich mich bei dir und schicke dir den Vertrag, wenn alles passt.'],
+['Willkommen (WhatsApp)','Hey [Name], herzlich willkommen im Coaching, ich freu mich auf dich! 🎀\nSo geht es jetzt weiter:\n1. Deinen Trainings- und Ernährungsplan bekommst du bis zum [Datum].\n2. Jeden Sonntag schickst du mir deinen Check-in per E-Mail, die Vorlage hängt an meiner E-Mail.\n3. Bis Dienstag bekommst du meine Rückmeldung dazu.\nFür kurze Fragen kannst du mir hier schreiben, ich antworte montags bis freitags. Fotos und Gesundheitsthemen schick mir bitte per E-Mail.\nWenn es dir mal körperlich nicht gut geht, sag mir Bescheid und geh im Zweifel zur Ärztin. Ich ersetze keine medizinische Beratung.'],
+['Erinnerung erster Check-in (WhatsApp)','Hey [Name], heute ist dein erster Check-in! 🎀\nEs muss nicht perfekt sein, schreib einfach ehrlich, wie deine Woche war. Du findest die Vorlage in meiner E-Mail.']];
+const STEPS=[['Anfrage',['Anfrage innerhalb von 48 Stunden beantwortet','Kurzes Gespräch: Ziele, Alltag, passt das Coaching?','Preis und Laufzeit genannt']],
+['Vertrag und Bezahlung',['Anamnesebogen geschickt und geprüft (Stopp-Regeln)','Vertrag aus leerer Vorlage erstellt und beidseitig unterschrieben','Widerrufsbelehrung mitgeschickt, vorzeitigen Beginn geprüft','Rechnung geschrieben und abgelegt','Erste Zahlung eingegangen']],
+['Start',['Kundinnen-Ordner aus _Vorlage Kundin angelegt','Vertrag und Anamnesebogen abgelegt','Willkommens-Nachricht geschickt','Trainings- und Ernährungsplan innerhalb von 5 Tagen geschickt','Check-in-Formular und Termin (Sonntag) erklärt','Start-Fotos erhalten (freiwillig)']],
+['Woche 10 und Abschluss',['Gespräch: Was hat sich verändert, wie geht es weiter?','Verlängerung schriftlich vereinbart oder Abschluss besprochen','Feedback erbeten (Zitat und Fotos nur mit schriftlicher Erlaubnis)','Nicht mehr benötigte Daten gelöscht, Rechnungen und Vertrag aufbewahrt']]];
+
+let storageOk=true, view='dash', openId=null;
+let db=load();
+function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){storageOk=false}return{clients:[],lastBackup:null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db));storageOk=true}catch(e){storageOk=false}}
+const $=s=>document.querySelector(s);
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const de=s=>s?parse(s).toLocaleDateString('de-DE'):'–';
+const euro=n=>Number(n||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+function today(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function addMonths(s,n){const d=parse(s),day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));return iso(d)}
+function addDays(s,n){const d=parse(s);d.setDate(d.getDate()+n);return iso(d)}
+function lastSunday(){const d=today();d.setDate(d.getDate()-d.getDay());return iso(d)}
+const client=id=>db.clients.find(c=>c.id===id);
+const active=()=>db.clients.filter(c=>c.status==='Aktiv');
+const endDate=c=>c.start?addMonths(c.start,Number(c.months)):null;
+function payments(c){if(!c.start)return[];return Array.from({length:Number(c.months)},(_,i)=>({i,due:addMonths(c.start,i),paid:!!c.paid[i],amount:Number(c.price)}))}
+function overdue(c){const t=iso(today());return payments(c).filter(p=>!p.paid&&p.due<=t)}
+function renewalDue(c){if(!c.start||c.status!=='Aktiv')return false;const t=iso(today()),e=endDate(c);return t>=addDays(e,-21)&&t<=e}
+function checkinOf(c,s){return c.checkins[s]||(c.checkins[s]={received:false,replied:false,weight:'',energy:'',mood:'',note:'',warn:false})}
+function hasWarn(c){const s=lastSunday();return !!(c.checkins[s]&&c.checkins[s].warn)}
+
+function go(v,id){view=v;openId=id||null;render();window.scrollTo(0,0)}
+function renderNav(){$('#nav').innerHTML=`<div class="brand">LILLY DILTHEY<small>Coaching Zentrale</small></div>`+VIEWS.map(([k,l])=>`<button class="${view===k?'on':''}" data-go="${k}">${l}</button>`).join('')}
+function banner(){return storageOk?'':'<div class="note warn"><b>Speichern klappt gerade nicht.</b> Dein Browser blockiert den Speicher dieser Seite (z. B. im privaten Fenster). Änderungen gehen beim Schließen verloren.</div>'}
+
+function dash(){
+  const s=lastSunday(),a=active();
+  const open=a.filter(c=>!(c.checkins[s]&&c.checkins[s].received));
+  const noReply=a.filter(c=>c.checkins[s]&&c.checkins[s].received&&!c.checkins[s].replied);
+  const od=a.flatMap(c=>overdue(c).map(p=>({c,p})));
+  const ren=a.filter(renewalDue),leads=db.clients.filter(c=>c.status==='Anfrage'),warn=a.filter(hasWarn);
+  const items=[];
+  warn.forEach(c=>items.push(`<tr><td><span class="tag warn">Warnzeichen</span></td><td>${link(c)}</td><td>Check-in ansehen, persönlich nachfragen</td></tr>`));
+  od.forEach(({c,p})=>items.push(`<tr><td><span class="tag warn">Zahlung</span></td><td>${link(c)}</td><td>${euro(p.amount)} war am ${de(p.due)} fällig</td></tr>`));
+  noReply.forEach(c=>items.push(`<tr><td><span class="tag">Antworten</span></td><td>${link(c)}</td><td>Check-in beantworten (bis Dienstag)</td></tr>`));
+  ren.forEach(c=>items.push(`<tr><td><span class="tag">Verlängerung</span></td><td>${link(c)}</td><td>Läuft am ${de(endDate(c))} aus, Gespräch führen</td></tr>`));
+  leads.forEach(c=>items.push(`<tr><td><span class="tag">Anfrage</span></td><td>${link(c)}</td><td>Innerhalb von 48 Stunden antworten</td></tr>`));
+  const old=db.clients.length&&(!db.lastBackup||Date.now()-new Date(db.lastBackup)>7*864e5);
+  return `<h1>Dashboard</h1>${banner()}${old?`<div class="note warn"><b>Zeit für ein Backup.</b> Deine Daten liegen nur auf diesem Gerät. <button class="link" data-go="settings">Jetzt sichern</button></div>`:''}
+  <div class="stats">${stat(a.length,'Aktive Kundinnen')}${stat(open.length,'Check-ins offen (So. '+de(s)+')')}${stat(od.length,'Zahlungen überfällig')}${stat(leads.length,'Offene Anfragen')}</div>
+  <div class="card"><h2>Das steht an</h2>${items.length?`<div class="tablewrap"><table>${items.join('')}</table></div>`:`<p class="muted">Gerade ist nichts offen.${db.clients.length?'':' Lege unter „Kundinnen“ deine erste Kundin an.'}</p>`}</div>`}
+const stat=(n,l)=>`<div class="stat"><b>${n}</b><span>${esc(l)}</span></div>`;
+const link=c=>`<button class="link" data-open="${c.id}">${esc(c.name)}</button>`;
+
+function clients(){
+  const rows=db.clients.map(c=>`<tr><td>${link(c)}</td><td><span class="tag ${c.status==='Aktiv'?'ok':''}">${esc(c.status)}</span>${hasWarn(c)&&c.status==='Aktiv'?' <span class="tag warn">Warnzeichen</span>':''}</td><td>${de(c.start)}</td><td>${de(endDate(c))}</td><td>${progress(c)}</td></tr>`).join('');
+  return `<h1>Kundinnen</h1><form id="newc" class="row" style="margin-bottom:14px;flex-wrap:nowrap"><input id="newn" placeholder="Name der neuen Kundin" autocomplete="off" aria-label="Name der neuen Kundin"><button class="btn">Anlegen</button></form>${banner()}
+  <div class="card">${rows?`<div class="tablewrap"><table><tr><th>Name</th><th>Status</th><th>Start</th><th>Ende</th><th>Checkliste</th></tr>${rows}</table></div>`:'<p class="muted">Noch keine Kundin angelegt.</p>'}</div>`}
+function progress(c){const all=STEPS.flatMap(x=>x[1]).length,done=Object.values(c.checks).filter(Boolean).length;return `${done} / ${all}`}
+
+function detail(c){
+  const pay=payments(c),t=iso(today());
+  const logs=Object.entries(c.checkins).filter(([,v])=>v.received||v.note||v.warn).sort((a,b)=>b[0].localeCompare(a[0]));
+  return `<button class="link" data-go="clients">‹ Alle Kundinnen</button>
+  <div class="row between" style="margin-top:8px"><h1>${esc(c.name)}</h1><button class="btn danger" data-del="${c.id}">Löschen</button></div>${banner()}
+  ${c.status==='Anfrage'?`<div class="note warn"><b>Stopp-Regeln vor dem Start.</b> Aktuelle Essstörung oder Warnzeichen, Schwangerschaft oder Stillzeit, unter 18, ernste Erkrankung oder relevante Medikamente, ausgebliebene Periode: kein Abnehm-Coaching starten, sondern ansprechen und an Ärztin, Therapeutin oder Beratungsstelle verweisen.</div>`:''}
+  <div class="card"><h2>Daten</h2><div class="form">
+    ${inp('name','Name',c.name)}${inp('email','E-Mail',c.email,'email')}${inp('phone','Telefon',c.phone,'tel')}
+    <label>Status<select data-f="status">${['Anfrage','Aktiv','Beendet'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></label>
+    ${inp('start','Coaching-Start',c.start,'date')}${inp('months','Laufzeit in Monaten',c.months,'number')}${inp('price','Preis pro Monat (€)',c.price,'number')}
+    <label>Ende<input value="${de(endDate(c))}" disabled></label>
+    <label class="full">Notizen (keine ausführlichen Gesundheitsdaten, die bleiben im Anamnesebogen)<textarea data-f="notes">${esc(c.notes)}</textarea></label>
+  </div></div>
+  <div class="grid2">
+    <div class="card"><h2>Zahlungen</h2>${pay.length?`<div class="tablewrap"><table><tr><th>Fällig</th><th>Betrag</th><th>Bezahlt</th></tr>${pay.map(p=>`<tr><td>${de(p.due)} ${!p.paid&&p.due<=t?'<span class="tag warn">überfällig</span>':''}</td><td>${euro(p.amount)}</td><td><input type="checkbox" style="width:auto" data-pay="${p.i}" ${p.paid?'checked':''} aria-label="Bezahlt"></td></tr>`).join('')}</table></div>
+      <div class="row" style="margin-top:10px"><button class="btn alt" data-ext="1">+1 Monat</button><button class="btn alt" data-ext="3">+3 Monate</button></div>`:'<p class="muted">Trag zuerst das Startdatum ein.</p>'}</div>
+    <div class="card"><h2>Checkliste</h2>${STEPS.map(([h,l])=>`<b style="font-size:13px">${h}</b>${l.map(x=>`<label class="check"><input type="checkbox" data-step="${esc(x)}" ${c.checks[x]?'checked':''}><span>${esc(x)}</span></label>`).join('')}`).join('<div style="height:8px"></div>')}</div>
+  </div>
+  <div class="card" style="margin-top:16px"><h2>Check-in-Verlauf</h2>${logs.length?`<div class="tablewrap"><table><tr><th>Sonntag</th><th>Gewicht</th><th>Energie</th><th>Stimmung</th><th>Notiz</th></tr>${logs.map(([s,v])=>`<tr><td>${de(s)} ${v.warn?'<span class="tag warn">Warnzeichen</span>':''}</td><td>${esc(v.weight)}</td><td>${esc(v.energy)}</td><td>${esc(v.mood)}</td><td>${esc(v.note)}</td></tr>`).join('')}</table></div>`:'<p class="muted">Noch keine Check-ins eingetragen. Das machst du unter „Check-In“.</p>'}</div>`}
+const inp=(f,l,v,t='text')=>`<label>${l}<input type="${t}" data-f="${f}" value="${esc(v)}"${t==='number'?' min="0"':''}></label>`;
+
+function checkin(){
+  const s=lastSunday(),a=active();
+  return `<h1>Check-In</h1>${banner()}<p class="muted">Woche mit Sonntag, ${de(s)}. Trag hier ein, was aus dem Formular wichtig ist, das PDF legst du in den Ordner der Kundin.</p>
+  ${a.length?a.map(c=>{const v=c.checkins[s]||{};return `<div class="card" data-ci="${c.id}"><div class="row between"><h2 style="margin:0">${link(c)}</h2><div class="row">
+    <label class="check"><input type="checkbox" data-cf="received" ${v.received?'checked':''}><span>Erhalten</span></label>
+    <label class="check"><input type="checkbox" data-cf="replied" ${v.replied?'checked':''}><span>Beantwortet</span></label>
+    <label class="check"><input type="checkbox" data-cf="warn" ${v.warn?'checked':''}><span>Warnzeichen</span></label></div></div>
+    <div class="form" style="margin-top:10px"><label>Gewicht Ø (freiwillig)<input data-cf="weight" value="${esc(v.weight)}"></label><label>Energie 1-10<input data-cf="energy" value="${esc(v.energy)}"></label><label>Stimmung 1-10<input data-cf="mood" value="${esc(v.mood)}"></label><label class="full">Notiz<input data-cf="note" value="${esc(v.note)}"></label></div></div>`}).join(''):'<div class="card"><p class="muted">Keine aktiven Kundinnen. Setze eine Kundin auf „Aktiv“, dann erscheint sie hier.</p></div>'}`}
+
+function money(){
+  const all=db.clients.flatMap(c=>payments(c).map(p=>({c,p}))).sort((a,b)=>b.p.due.localeCompare(a.p.due));
+  const y=String(today().getFullYear()),m=iso(today()).slice(0,7);
+  const sum=f=>all.filter(f).reduce((n,x)=>n+x.p.amount,0);
+  return `<h1>Buchhaltung</h1>${banner()}<div class="stats">${stat(euro(sum(x=>x.p.paid&&x.p.due.startsWith(m))),'Bezahlt, fällig diesen Monat')}${stat(euro(sum(x=>x.p.paid&&x.p.due.startsWith(y))),'Bezahlt, fällig '+y)}${stat(euro(sum(x=>!x.p.paid&&x.p.due<=iso(today()))),'Überfällig')}</div>
+  <p class="muted">Das ist nur deine Übersicht und ersetzt weder Rechnungen noch Steuerunterlagen.</p>
+  <div class="card">${all.length?`<div class="tablewrap"><table><tr><th>Fällig</th><th>Kundin</th><th>Betrag</th><th>Status</th></tr>${all.map(({c,p})=>`<tr><td>${de(p.due)}</td><td>${link(c)}</td><td>${euro(p.amount)}</td><td>${p.paid?'<span class="tag ok">bezahlt</span>':p.due<=iso(today())?'<span class="tag warn">überfällig</span>':'<span class="tag">offen</span>'}</td></tr>`).join('')}</table></div>`:'<p class="muted">Noch keine Zahlungen. Sie entstehen, sobald eine Kundin ein Startdatum hat.</p>'}</div>`}
+
+function docs(){
+  return `<h1>Vorlagen</h1><div class="card"><h2>Dokumente</h2><p class="muted" style="margin:0">Vertrag, Anamnesebogen und Check-in-Formular findest du in der App <b>Dateien</b> unter iCloud Drive, Online Coaching. Hier in der App liegen bewusst keine Dokumente.</p></div>
+  <h2 style="margin-top:18px">Nachrichten zum Kopieren</h2>${MSGS.map(([h,t],i)=>`<div class="card"><h2>${esc(h)}</h2><pre>${esc(t)}</pre><button class="btn alt" data-copy="${i}">Kopieren</button></div>`).join('')}`}
+
+function settings(){
+  return `<h1>Daten & Backup</h1>${banner()}
+  <div class="note"><b>Wo liegen deine Daten?</b> Nur in dieser App auf diesem Gerät. Sie werden nirgends hochgeladen und gleichen sich nicht mit anderen Geräten ab. Löschst du die App vom Home-Bildschirm, sind sie weg. Mach deshalb regelmäßig ein Backup.</div>
+  <div class="card"><h2>Backup</h2><p class="muted">Letztes Backup: ${db.lastBackup?new Date(db.lastBackup).toLocaleString('de-DE'):'noch keins'}. Die Datei enthält Kundendaten. Sichere sie im iCloud-Ordner Online Coaching und lösch sie danach aus „Downloads“.</p>
+  <div class="row"><button class="btn" data-export>Backup speichern</button><label class="btn alt" style="color:var(--rose);margin:0;cursor:pointer">Backup laden<input type="file" accept="application/json" data-import style="display:none"></label></div></div>`}
+
+function render(){renderNav();const c=openId&&client(openId);$('#main').innerHTML=c?detail(c):({dash,clients,checkin,money,docs,settings}[view])()}
+
+document.addEventListener('click',e=>{const t=e.target,d=t.closest('[data-go],[data-open],[data-new],[data-del],[data-ext],[data-copy],[data-export]');if(!d)return;const ds=d.dataset;
+  if('go' in ds)go(ds.go);
+  else if('open' in ds)go('clients',ds.open);
+  else if('del' in ds){const c=client(ds.del);if(confirm(`${c.name} und alle Einträge hier endgültig löschen?`)){db.clients=db.clients.filter(x=>x.id!==c.id);save();go('clients')}}
+  else if('ext' in ds){const c=client(openId);c.months=Number(c.months)+Number(ds.ext);save();render()}
+  else if('copy' in ds){navigator.clipboard.writeText(MSGS[ds.copy][1]).then(()=>{d.textContent='Kopiert'},()=>{d.textContent='Bitte von Hand kopieren'})}
+  else if('export' in ds){db.lastBackup=new Date().toISOString();save();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download=`coaching-backup-${iso(today())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);render()}
+});
+document.addEventListener('submit',e=>{if(e.target.id!=='newc')return;e.preventDefault();const n=$('#newn').value.trim();if(!n)return;const c={id:String(Date.now()),name:n,email:'',phone:'',status:'Anfrage',start:'',months:3,price:150,notes:'',checks:{},paid:{},checkins:{}};db.clients.push(c);save();go('clients',c.id)});
+document.addEventListener('input',e=>{const t=e.target,c=openId&&client(openId);
+  if(t.dataset.f&&c&&t.type!=='date'&&t.tagName!=='SELECT'&&t.type!=='number'){c[t.dataset.f]=t.value;save()}
+  if(t.dataset.cf&&t.type!=='checkbox'){const x=client(t.closest('[data-ci]').dataset.ci);checkinOf(x,lastSunday())[t.dataset.cf]=t.value;save()}
+});
+document.addEventListener('change',e=>{const t=e.target,c=openId&&client(openId);
+  if(t.dataset.f&&c&&(t.type==='date'||t.type==='number'||t.tagName==='SELECT')){let v=t.value;if(t.dataset.f==='months')v=Math.max(1,Math.floor(Number(v))||1);if(t.dataset.f==='price')v=Math.max(0,Number(v)||0);c[t.dataset.f]=v;save();render()}
+  if(t.dataset.f==='name'&&c)render();
+  if(t.dataset.pay!==undefined&&c){c.paid[t.dataset.pay]=t.checked;save();render()}
+  if(t.dataset.step!==undefined&&c){c.checks[t.dataset.step]=t.checked;save()}
+  if(t.dataset.cf&&t.type==='checkbox'){const x=client(t.closest('[data-ci]').dataset.ci);checkinOf(x,lastSunday())[t.dataset.cf]=t.checked;save()}
+  if('import' in t.dataset&&t.files[0]){const r=new FileReader();r.onload=()=>{try{const n=JSON.parse(r.result);if(!Array.isArray(n.clients))throw 0;if(confirm(`Backup mit ${n.clients.length} Kundinnen laden? Die aktuellen Daten hier werden ersetzt.`)){db=n;save();go('dash')}}catch(x){alert('Diese Datei ist kein gültiges Backup.')}};r.readAsText(t.files[0])}
+});
+render();
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
